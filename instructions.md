@@ -6,13 +6,23 @@ Ferramentas em Python para **baixar áudio (MP3)**, **vídeo (MP4)** e **gerar t
 
 ## 1. Preparar o ambiente (uma vez)
 
-Na pasta do projeto:
+Na pasta do projeto, execute o script **`init.sh`** (cria o venv, instala dependências e a pasta `out/`):
+
+```bash
+chmod +x init.sh
+./init.sh
+```
+
+Ou, manualmente, os mesmos passos:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -U -r requirements.txt
+mkdir -p out
 ```
+
+A pasta **`out/`** guarda transcrições e mídia baixada; os scripts também a criam automaticamente se não existir.
 
 No macOS, para converter áudio em MP3 e mesclar faixas de vídeo, é necessário **FFmpeg** (por exemplo: `brew install ffmpeg`).
 
