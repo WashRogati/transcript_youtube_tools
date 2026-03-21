@@ -6,6 +6,8 @@ from pytubefix import YouTube
 from youtube_transcript_api import YouTubeTranscriptApi
 import yt_dlp
 
+from out_dir import out_dir
+
 if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8')
 
@@ -139,7 +141,7 @@ def main():
         print("[ERRO] Link inválido ou vazio!")
         return
 
-    folder = os.path.dirname(os.path.abspath(__file__))
+    folder = out_dir()
 
     while True:
         print("\nO que você deseja fazer?\n1. Gerar Transcrições (3 métodos)\n2. Baixar VIDEO (MP4)\n3. Baixar AUDIO (MP3)\n0. Sair")

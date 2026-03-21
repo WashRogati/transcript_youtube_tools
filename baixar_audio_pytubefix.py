@@ -1,6 +1,8 @@
 import os
 from pytubefix import YouTube
 
+from out_dir import out_dir
+
 url = input("Digite a URL do YouTube: ").strip()
 
 try:
@@ -10,7 +12,7 @@ try:
     stream = yt.streams.get_audio_only()
     print(f"Baixando: {yt.title}")
     
-    out_file = stream.download()
+    out_file = stream.download(output_path=out_dir())
     
     base, ext = os.path.splitext(out_file)
     new_file = base + '.mp3'

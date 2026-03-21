@@ -1,21 +1,25 @@
-import subprocess
 import glob
+import os
+import subprocess
+
+from out_dir import out_dir
 
 url = input("Digite a URL do YouTube: ").strip()
 
 try:
     print("Baixando legendas...")
-    
+    _out = out_dir()
+    base = os.path.join(_out, "resultado_ytdlp_temp")
     subprocess.run([
         "yt-dlp",
         "--write-auto-sub",
         "--sub-lang", "pt",
         "--skip-download",
-        "-o", "resultado_ytdlp_temp",
+        "-o", base + ".%(ext)s",
         url
     ], check=True, text=True, encoding="utf-8", errors="replace", timeout=60)
     
-    arquivos = glob.glob("resultado_ytdlp_temp.*")
+    arquivos = glob.glob(os.path.join(_out, "resultado_ytdlp_temp.*"))
     
     if arquivos:
         print(f"[OK] Legenda salva como: {arquivos[0]}")

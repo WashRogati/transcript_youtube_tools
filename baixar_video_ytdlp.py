@@ -1,10 +1,15 @@
+import os
+
 import yt_dlp
+
+from out_dir import out_dir
 
 url = input("Digite a URL do YouTube: ").strip()
 
+_out = out_dir()
 opts = {
     'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
-    'outtmpl': '%(title)s.%(ext)s',
+    'outtmpl': os.path.join(_out, '%(title)s.%(ext)s'),
 }
 
 try:

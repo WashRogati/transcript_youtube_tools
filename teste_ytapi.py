@@ -1,5 +1,8 @@
+import os
 import re
 from youtube_transcript_api import YouTubeTranscriptApi
+
+from out_dir import out_dir
 
 url = input("Digite a URL do YouTube: ").strip()
 match = re.search(r'(?:v=|\/|embed\/|shorts\/|be\/)([0-9A-Za-z_-]{11})', url)
@@ -44,9 +47,10 @@ try:
 
     if transcript:
         texto = " ".join([t.get('text', '') for t in transcript]).strip()
-        with open("resultado_ytapi.txt", "w", encoding="utf-8") as f:
+        dest = os.path.join(out_dir(), "resultado_ytapi.txt")
+        with open(dest, "w", encoding="utf-8") as f:
             f.write(texto)
-        print("\n[OK] Transcricao salva em: resultado_ytapi.txt")
+        print(f"\n[OK] Transcricao salva em: {dest}")
     else:
         print("\n[AVISO] Nenhuma transcricao extraida no final do processo.")
         

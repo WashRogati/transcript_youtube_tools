@@ -1,5 +1,8 @@
+import os
 import re
 from pytubefix import YouTube
+
+from out_dir import out_dir
 
 url = input("Digite a URL do YouTube: ").strip()
 
@@ -17,10 +20,11 @@ try:
             if linha and not linha.isdigit() and '-->' not in linha:
                 if not linhas or linhas[-1] != linha: linhas.append(linha)
                 
-        with open("resultado_pytubefix.txt", "w", encoding="utf-8") as f:
+        dest = os.path.join(out_dir(), "resultado_pytubefix.txt")
+        with open(dest, "w", encoding="utf-8") as f:
             f.write(" ".join(linhas))
             
-        print("Transcricao gerada: resultado_pytubefix.txt")
+        print(f"Transcricao gerada: {dest}")
     else:
         print("Nenhuma legenda encontrada.")
 except Exception as e:

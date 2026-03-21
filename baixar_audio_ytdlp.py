@@ -1,10 +1,15 @@
+import os
+
 import yt_dlp
+
+from out_dir import out_dir
 
 url = input("Digite a URL do YouTube: ").strip()
 
+_out = out_dir()
 opts = {
     'format': 'bestaudio/best',
-    'outtmpl': '%(title)s.%(ext)s',
+    'outtmpl': os.path.join(_out, '%(title)s.%(ext)s'),
     'postprocessors': [{
         'key': 'FFmpegExtractAudio',
         'preferredcodec': 'mp3',
