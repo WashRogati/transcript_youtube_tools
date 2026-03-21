@@ -52,6 +52,28 @@ O método **yt-dlp** na transcrição usa o comando `yt-dlp` no terminal; com o 
 
 ---
 
+## 2.1. Só transcrições (`transcrever.py`)
+
+Para gerar transcrições **sem o menu interativo** (mesmos arquivos em `out/` que a opção **1** do `tools.py`):
+
+```bash
+source .venv/bin/activate
+python transcrever.py "https://www.youtube.com/watch?v=..."
+```
+
+Se você não passar a URL, o script pede no terminal.
+
+Escolher **um ou mais** métodos (padrão: os três):
+
+```bash
+python transcrever.py "URL" --metodo yt-api
+python transcrever.py "URL" --metodo pytubefix --metodo ytdlp
+```
+
+Valores de `--metodo`: `yt-api`, `pytubefix`, `ytdlp`.
+
+---
+
 ## 3. Scripts avulsos (só áudio ou só vídeo)
 
 São atalhos que pedem a URL no terminal e gravam os arquivos em **`out/`** (na raiz do projeto).

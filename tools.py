@@ -131,6 +131,38 @@ def get_transcript_ytdlp(url, folder, slug, video_id):
     except Exception as e:
         print(f"[ERRO] {str(e)}")
 
+def run_transcriptions(url, metodos=None, folder=None, slug=None):
+    """
+    Gera transcrições em out/ usando um ou mais métodos.
+    metodos: None = todos; ou conjunto/lista com 'yt-api', 'pytubefix', 'ytdlp'.
+    folder/slug: se omitidos, são obtidos automaticamente (título via yt-dlp).
+    Retorna False se a URL for inválida.
+    """
+    video_id = get_video_id(url) if url else None
+    if not video_id:
+        print("[ERRO] Link inválido ou vazio!")
+        return False
+
+    if folder is None:
+        folder = out_dir()
+    if slug is None:
+        try:
+            title = fetch_video_title(url)
+        except Exception as e:
+            print(f"[AVISO] Não foi possível obter o título do vídeo: {e}")
+            title = ""
+        slug = slugify_title(title) or video_id
+        print(f"[INFO] Arquivos usarão o prefixo: {slug}")
+
+    ativos = {"yt-api", "pytubefix", "ytdlp"} if metodos is None else set(metodos)
+    if "yt-api" in ativos:
+        get_transcript_ytapi(video_id, folder, slug)
+    if "pytubefix" in ativos:
+        get_transcript_pytubefix(url, folder, slug)
+    if "ytdlp" in ativos:
+        get_transcript_ytdlp(url, folder, slug, video_id)
+    return True
+
 def download_media(url, folder, mode, slug):
     print(f"\n[INICIO] Download de {mode}...")
     try:
@@ -176,9 +208,7 @@ def main():
         choice = input("\nEscolha: ").strip()
         
         if choice == '1':
-            get_transcript_ytapi(video_id, folder, slug)
-            get_transcript_pytubefix(url, folder, slug)
-            get_transcript_ytdlp(url, folder, slug, video_id)
+            run_transcriptions(url, folder=folder, slug=slug)
         elif choice == '2': download_media(url, folder, 'video', slug)
         elif choice == '3': download_media(url, folder, 'audio', slug)
         elif choice == '0': break
