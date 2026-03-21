@@ -98,7 +98,14 @@ python transcrever.py "URL" --markdown
 python transcrever.py "URL" -m
 ```
 
-O conteúdo continua sendo texto puro; só muda a extensão do arquivo (útil para vaults Obsidian e similares).
+Com **`-m` / `--markdown`**, o arquivo `.md` segue este formato:
+
+1. Primeira linha: **título do vídeo** (obtido via yt-dlp).
+2. Linha **`**Link:**`** seguida da URL usada no comando.
+3. Título de nível 3 **`### Conteúdo`** e, abaixo, o texto da transcrição.
+4. Ao final: data e hora locais em que a transcrição foi gerada (`*Transcrito em: ...*`).
+
+Útil para vaults Obsidian e notas em Markdown.
 
 ---
 
