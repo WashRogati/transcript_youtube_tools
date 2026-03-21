@@ -1,0 +1,14 @@
+# Ignorar arquivos de saida da transcricao e midia
+*.txt
+*.mp4
+*.mp3
+*.m4a
+*.srt
+*.vtt
+*_temp*
+
+# Ignorar arquivos do Python
+__pycache__/
+*.pyc
+.env
+/.vscode/
