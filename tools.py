@@ -2,6 +2,7 @@ import os
 import re
 import subprocess
 import sys
+import unicodedata
 from pytubefix import YouTube
 from youtube_transcript_api import YouTubeTranscriptApi
 import yt_dlp
@@ -14,6 +15,27 @@ if hasattr(sys.stdout, 'reconfigure'):
 def get_video_id(url):
     match = re.search(r'(?:v=|\/|embed\/|shorts\/|be\/)([0-9A-Za-z_-]{11})', url)
     return match.group(1) if match else None
+
+def slugify_title(text, max_len=120):
+    """Nome de arquivo seguro: minúsculas, hífens, sem acentos."""
+    if not text or not str(text).strip():
+        return ""
+    s = unicodedata.normalize("NFKD", str(text))
+    s = "".join(c for c in s if not unicodedata.combining(c))
+    s = s.lower()
+    s = re.sub(r"[^a-z0-9]+", "-", s)
+    s = re.sub(r"-+", "-", s).strip("-")
+    if not s:
+        return ""
+    return s[:max_len]
+
+def fetch_video_title(url):
+    opts = {"quiet": True, "no_warnings": True, "skip_download": True, "noplaylist": True}
+    with yt_dlp.YoutubeDL(opts) as ydl:
+        info = ydl.extract_info(url, download=False)
+    if not info:
+        return ""
+    return (info.get("title") or info.get("id") or "").strip()
 
 def save_to_file(filename, text):
     with open(filename, "w", encoding="utf-8") as f:
@@ -31,7 +53,7 @@ def limpar_legenda(texto):
             linhas_limpas.append(linha)
     return " ".join(linhas_limpas).strip()
 
-def get_transcript_ytapi(video_id, folder):
+def get_transcript_ytapi(video_id, folder, slug):
     print("\n[1/3] youtube-transcript-api...")
     try:
         transcript = None
@@ -54,13 +76,13 @@ def get_transcript_ytapi(video_id, folder):
         if transcript:
             final_text = " ".join([entry.get('text', '') for entry in transcript]).strip()
             if final_text:
-                save_to_file(os.path.join(folder, "transcricao_yt_api.txt"), final_text)
+                save_to_file(os.path.join(folder, f"{slug}_transcricao_yt_api.txt"), final_text)
                 return
         print("[AVISO] Nenhuma transcricao encontrada.")
     except Exception as e:
         print(f"[ERRO] {str(e)}")
 
-def get_transcript_pytubefix(url, folder):
+def get_transcript_pytubefix(url, folder, slug):
     print("\n[2/3] pytubefix...")
     try:
         yt = YouTube(url)
@@ -76,7 +98,7 @@ def get_transcript_pytubefix(url, folder):
         if caption:
             final_text = limpar_legenda(caption.generate_srt_captions())
             if final_text:
-                save_to_file(os.path.join(folder, "transcricao_pytubefix.txt"), final_text)
+                save_to_file(os.path.join(folder, f"{slug}_transcricao_pytubefix.txt"), final_text)
             else:
                 print("[ERRO] Transcricao vazia.")
         else:
@@ -84,10 +106,9 @@ def get_transcript_pytubefix(url, folder):
     except Exception as e:
         print(f"[ERRO] {str(e)}")
 
-def get_transcript_ytdlp(url, folder):
+def get_transcript_ytdlp(url, folder, slug, video_id):
     print("\n[3/3] yt-dlp...")
     try:
-        video_id = get_video_id(url)
         sub_file_base = os.path.join(folder, f"_sub_temp_{video_id}")
         
         subprocess.run([
@@ -101,7 +122,7 @@ def get_transcript_ytdlp(url, folder):
             with open(found_path, "r", encoding="utf-8", errors="replace") as arq:
                 final_text = limpar_legenda(arq.read())
             
-            if final_text:save_to_file(os.path.join(folder, "transcricao_ytdlp.txt"), final_text)
+            if final_text:save_to_file(os.path.join(folder, f"{slug}_transcricao_ytdlp.txt"), final_text)
             else: print("[ERRO] Legenda vazia.")
             
             os.remove(found_path)
@@ -110,11 +131,11 @@ def get_transcript_ytdlp(url, folder):
     except Exception as e:
         print(f"[ERRO] {str(e)}")
 
-def download_media(url, folder, mode='video'):
+def download_media(url, folder, mode, slug):
     print(f"\n[INICIO] Download de {mode}...")
     try:
         opts = {
-            'outtmpl': os.path.join(folder, '%(title)s.%(ext)s'),
+            'outtmpl': os.path.join(folder, f"{slug}.%(ext)s"),
             'quiet': True, 'no_warnings': True
         }
         if mode == 'audio':
@@ -142,17 +163,24 @@ def main():
         return
 
     folder = out_dir()
+    try:
+        title = fetch_video_title(url)
+    except Exception as e:
+        print(f"[AVISO] Não foi possível obter o título do vídeo: {e}")
+        title = ""
+    slug = slugify_title(title) or video_id
+    print(f"[INFO] Arquivos usarão o prefixo: {slug}")
 
     while True:
         print("\nO que você deseja fazer?\n1. Gerar Transcrições (3 métodos)\n2. Baixar VIDEO (MP4)\n3. Baixar AUDIO (MP3)\n0. Sair")
         choice = input("\nEscolha: ").strip()
         
         if choice == '1':
-            get_transcript_ytapi(video_id, folder)
-            get_transcript_pytubefix(url, folder)
-            get_transcript_ytdlp(url, folder)
-        elif choice == '2': download_media(url, folder, 'video')
-        elif choice == '3': download_media(url, folder, 'audio')
+            get_transcript_ytapi(video_id, folder, slug)
+            get_transcript_pytubefix(url, folder, slug)
+            get_transcript_ytdlp(url, folder, slug, video_id)
+        elif choice == '2': download_media(url, folder, 'video', slug)
+        elif choice == '3': download_media(url, folder, 'audio', slug)
         elif choice == '0': break
         else: print("[AVISO] Inválido.")
 

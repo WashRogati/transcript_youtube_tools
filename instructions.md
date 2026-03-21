@@ -42,9 +42,11 @@ Tudo é gravado na pasta **`out/`** na raiz do projeto (criada automaticamente s
 
 | Ação | Arquivos gerados (exemplos, todos em `out/`) |
 |------|-----------------------------|
-| Opção 1 — transcrições | `out/transcricao_yt_api.txt`, `out/transcricao_pytubefix.txt`, `out/transcricao_ytdlp.txt` |
-| Opção 2 — vídeo | `out/Nome do vídeo.mp4` (ou extensão que o yt-dlp escolher) |
-| Opção 3 — áudio | `out/Nome do vídeo.mp3` |
+| Opção 1 — transcrições | `out/<slug>_transcricao_yt_api.txt`, `out/<slug>_transcricao_pytubefix.txt`, `out/<slug>_transcricao_ytdlp.txt` |
+| Opção 2 — vídeo | `out/<slug>.mp4` (ou extensão que o yt-dlp escolher) |
+| Opção 3 — áudio | `out/<slug>.mp3` |
+
+O **`<slug>`** é o título do vídeo normalizado (minúsculas, sem acentos, hífens no lugar de espaços). Se o título não puder ser obtido, usa-se o ID do vídeo. Ao iniciar, o programa mostra `[INFO] Arquivos usarão o prefixo: ...`.
 
 O método **yt-dlp** na transcrição usa o comando `yt-dlp` no terminal; com o venv ativado, ele costuma estar em `.venv/bin/yt-dlp`. Se der erro de “comando não encontrado”, rode o `tools.py` com o venv ativado ou use o caminho completo: `.venv/bin/python tools.py`.
 
