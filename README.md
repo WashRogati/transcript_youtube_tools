@@ -91,6 +91,15 @@ python transcrever.py "URL" --out ~/Downloads/transcricoes
 
 A pasta é criada automaticamente se não existir.
 
+Salvar como **Markdown** (`.md`) em vez de `.txt`:
+
+```bash
+python transcrever.py "URL" --markdown
+python transcrever.py "URL" -m
+```
+
+O conteúdo continua sendo texto puro; só muda a extensão do arquivo (útil para vaults Obsidian e similares).
+
 ---
 
 ## 3. Scripts avulsos (só áudio ou só vídeo)

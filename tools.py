@@ -42,6 +42,15 @@ def save_to_file(filename, text):
         f.write(text)
     print(f"[OK] Arquivo salvo: {os.path.basename(filename)}")
 
+def normalize_output_ext(ext):
+    """Aceita 'txt', '.txt', 'md', '.md' → '.txt' ou '.md'."""
+    if not ext:
+        return ".txt"
+    e = str(ext).strip().lower()
+    if not e.startswith("."):
+        e = "." + e
+    return ".md" if e == ".md" else ".txt"
+
 def limpar_legenda(texto):
     linhas_limpas = []
     for linha in texto.splitlines():
@@ -53,7 +62,7 @@ def limpar_legenda(texto):
             linhas_limpas.append(linha)
     return " ".join(linhas_limpas).strip()
 
-def get_transcript_ytapi(video_id, folder, slug):
+def get_transcript_ytapi(video_id, folder, slug, ext=".txt"):
     print("\n[1/3] youtube-transcript-api...")
     try:
         transcript = None
@@ -76,13 +85,13 @@ def get_transcript_ytapi(video_id, folder, slug):
         if transcript:
             final_text = " ".join([entry.get('text', '') for entry in transcript]).strip()
             if final_text:
-                save_to_file(os.path.join(folder, f"{slug}_transcricao_yt_api.txt"), final_text)
+                save_to_file(os.path.join(folder, f"{slug}_transcricao_yt_api{ext}"), final_text)
                 return
         print("[AVISO] Nenhuma transcricao encontrada.")
     except Exception as e:
         print(f"[ERRO] {str(e)}")
 
-def get_transcript_pytubefix(url, folder, slug):
+def get_transcript_pytubefix(url, folder, slug, ext=".txt"):
     print("\n[2/3] pytubefix...")
     try:
         yt = YouTube(url)
@@ -98,7 +107,7 @@ def get_transcript_pytubefix(url, folder, slug):
         if caption:
             final_text = limpar_legenda(caption.generate_srt_captions())
             if final_text:
-                save_to_file(os.path.join(folder, f"{slug}_transcricao_pytubefix.txt"), final_text)
+                save_to_file(os.path.join(folder, f"{slug}_transcricao_pytubefix{ext}"), final_text)
             else:
                 print("[ERRO] Transcricao vazia.")
         else:
@@ -106,7 +115,7 @@ def get_transcript_pytubefix(url, folder, slug):
     except Exception as e:
         print(f"[ERRO] {str(e)}")
 
-def get_transcript_ytdlp(url, folder, slug, video_id):
+def get_transcript_ytdlp(url, folder, slug, video_id, ext=".txt"):
     print("\n[3/3] yt-dlp...")
     try:
         sub_file_base = os.path.join(folder, f"_sub_temp_{video_id}")
@@ -122,7 +131,7 @@ def get_transcript_ytdlp(url, folder, slug, video_id):
             with open(found_path, "r", encoding="utf-8", errors="replace") as arq:
                 final_text = limpar_legenda(arq.read())
             
-            if final_text:save_to_file(os.path.join(folder, f"{slug}_transcricao_ytdlp.txt"), final_text)
+            if final_text:save_to_file(os.path.join(folder, f"{slug}_transcricao_ytdlp{ext}"), final_text)
             else: print("[ERRO] Legenda vazia.")
             
             os.remove(found_path)
@@ -131,12 +140,13 @@ def get_transcript_ytdlp(url, folder, slug, video_id):
     except Exception as e:
         print(f"[ERRO] {str(e)}")
 
-def run_transcriptions(url, metodos=None, folder=None, slug=None):
+def run_transcriptions(url, metodos=None, folder=None, slug=None, ext=".txt"):
     """
     Gera transcrições em out/ (ou em folder) usando um ou mais métodos.
     metodos: None = todos; ou conjunto/lista com 'yt-api', 'pytubefix', 'ytdlp'.
     folder/slug: se omitidos, são obtidos automaticamente (título via yt-dlp).
     folder: caminho absoluto; a pasta é criada se não existir.
+    ext: extensão dos arquivos (.txt ou .md); use normalize_output_ext.
     Retorna False se a URL for inválida.
     """
     video_id = get_video_id(url) if url else None
@@ -158,13 +168,15 @@ def run_transcriptions(url, metodos=None, folder=None, slug=None):
         slug = slugify_title(title) or video_id
         print(f"[INFO] Arquivos usarão o prefixo: {slug}")
 
+    ext = normalize_output_ext(ext)
+
     ativos = {"yt-api", "pytubefix", "ytdlp"} if metodos is None else set(metodos)
     if "yt-api" in ativos:
-        get_transcript_ytapi(video_id, folder, slug)
+        get_transcript_ytapi(video_id, folder, slug, ext)
     if "pytubefix" in ativos:
-        get_transcript_pytubefix(url, folder, slug)
+        get_transcript_pytubefix(url, folder, slug, ext)
     if "ytdlp" in ativos:
-        get_transcript_ytdlp(url, folder, slug, video_id)
+        get_transcript_ytdlp(url, folder, slug, video_id, ext)
     return True
 
 def download_media(url, folder, mode, slug):

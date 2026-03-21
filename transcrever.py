@@ -5,7 +5,7 @@ Gera transcrições (legendas/texto) em out/ (ou pasta --out) sem usar o menu do
 import argparse
 import sys
 
-from tools import run_transcriptions
+from tools import normalize_output_ext, run_transcriptions
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
@@ -24,7 +24,13 @@ def main():
         "-o",
         "--out",
         metavar="PASTA",
-        help="Pasta onde salvar os .txt (padrão: out/ na raiz do projeto)",
+        help="Pasta de saída (padrão: out/ na raiz do projeto)",
+    )
+    parser.add_argument(
+        "-m",
+        "--markdown",
+        action="store_true",
+        help="Salvar como .md em vez de .txt",
     )
     parser.add_argument(
         "--metodo",
@@ -39,7 +45,8 @@ def main():
     metodos = args.metodo if args.metodo else None
 
     pasta = (args.out or "").strip() or None
-    if not run_transcriptions(url, metodos=metodos, folder=pasta):
+    ext = normalize_output_ext("md" if args.markdown else "txt")
+    if not run_transcriptions(url, metodos=metodos, folder=pasta, ext=ext):
         sys.exit(1)
 
 
