@@ -82,6 +82,15 @@ python transcrever.py "URL" --metodo pytubefix --metodo ytdlp
 
 Valores de `--metodo`: `yt-api`, `pytubefix`, `ytdlp`.
 
+Outra pasta de saída (em vez do `out/` padrão do projeto):
+
+```bash
+python transcrever.py "URL" -o /caminho/para/minha_pasta
+python transcrever.py "URL" --out ~/Downloads/transcricoes
+```
+
+A pasta é criada automaticamente se não existir.
+
 ---
 
 ## 3. Scripts avulsos (só áudio ou só vídeo)

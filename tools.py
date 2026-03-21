@@ -133,9 +133,10 @@ def get_transcript_ytdlp(url, folder, slug, video_id):
 
 def run_transcriptions(url, metodos=None, folder=None, slug=None):
     """
-    Gera transcrições em out/ usando um ou mais métodos.
+    Gera transcrições em out/ (ou em folder) usando um ou mais métodos.
     metodos: None = todos; ou conjunto/lista com 'yt-api', 'pytubefix', 'ytdlp'.
     folder/slug: se omitidos, são obtidos automaticamente (título via yt-dlp).
+    folder: caminho absoluto; a pasta é criada se não existir.
     Retorna False se a URL for inválida.
     """
     video_id = get_video_id(url) if url else None
@@ -145,6 +146,9 @@ def run_transcriptions(url, metodos=None, folder=None, slug=None):
 
     if folder is None:
         folder = out_dir()
+    else:
+        folder = os.path.abspath(os.path.expanduser(folder))
+        os.makedirs(folder, exist_ok=True)
     if slug is None:
         try:
             title = fetch_video_title(url)
