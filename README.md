@@ -98,14 +98,17 @@ python transcrever.py "URL" --markdown
 python transcrever.py "URL" -m
 ```
 
-Com **`-m` / `--markdown`**, o arquivo `.md` segue este formato:
+Com **`-m` / `--markdown`**, o arquivo `.md` inclui (via **yt-dlp**):
 
-1. Primeira linha: **título do vídeo** (obtido via yt-dlp).
-2. Linha **`**Link:**`** seguida da URL usada no comando.
-3. Título de nível 3 **`### Conteúdo`** e, abaixo, o texto da transcrição.
-4. Ao final: data e hora locais em que a transcrição foi gerada (`*Transcrito em: ...*`).
+1. Primeira linha: **título do vídeo**; em seguida **`**Link:**`** com a URL.
+2. **`### Canal`** — nome, ID e URL do canal.
+3. **`### Vídeo`** — ID, duração, visualizações, data de publicação, categorias, idioma de áudio informado pelo YouTube e trecho da descrição (limitado).
+4. **`### Idioma da transcrição`** — qual legenda/transcrição foi usada (varia por método: youtube-transcript-api, pytubefix ou yt-dlp).
+5. **`### Conteúdo`** — texto da transcrição.
+6. Rodapé com data e hora em que o arquivo foi gerado.
 
-Útil para vaults Obsidian e notas em Markdown.
+Útil para vaults Obsidian e notas em Markdown. Com **`.txt`**, o arquivo continua só com o texto da transcrição (sem esse bloco de metadados).
+
 
 ---
 
